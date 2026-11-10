@@ -1,4 +1,4 @@
-# Secrets — never commit real keys (use .env.example as the template)
+# Secrets - never commit real keys (use .env.example as the template)
 .env
 .env.*
 !.env.example
@@ -12,11 +12,11 @@ __pycache__/
 .pytest_cache/
 
 # Large / regenerable data
-# ~47 MB ATT&CK bundle — download per README
+# ~47 MB ATT&CK bundle - download per README
 data/mitre_attack.json
-# Vector store — rebuilt by src/rag.py
+# Vector store - rebuilt by src/rag.py
 chroma_db/
-# Provenance manifest — derived from your local ATT&CK bundle (python src/rag.py --manifest-only)
+# Provenance manifest - derived from your local ATT&CK bundle (python src/rag.py --manifest-only)
 data/rag_manifest.json
 
 # Runtime artifacts (curated copies of results live in docs/results/)

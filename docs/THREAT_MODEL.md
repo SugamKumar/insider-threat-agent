@@ -31,7 +31,7 @@ flowchart LR
 | **TB1** logs → agent | Field values (location, resource, destination, ticket) | An insider can influence values written to logs: hostnames, file names, email subjects, VPN client strings, forged ticket references |
 | **TB2** APIs → agent | IP reputation and geolocation fields (ISP, org, city) | Whoever controls an IP range controls its WHOIS/ISP strings. The insider can route through infrastructure they control |
 | **TB3** vector store → agent | Retrieved ATT&CK documents | Anyone with write access to the store can insert or edit documents |
-| **TB4** agent → report | Findings and risk levels | LLM output is probabilistic and can be manipulated through any of TB1–TB3 |
+| **TB4** agent → report | Findings and risk levels | LLM output is probabilistic and can be manipulated through any of TB1-TB3 |
 
 ## Assets
 
@@ -51,10 +51,10 @@ flowchart LR
 | T5 | Forged justification ("approved under CHG-1234") | ASI09 | Ticket claims are verified out-of-band against the change registry (`verify_change_ticket`). The guardrail adds +3 evidence for unverifiable tickets | Unit tests; hard-mode `malicious_forged_ticket` scenario | Compromise of the registry itself |
 | T6 | Excessive agency / tool misuse | OWASP **ASI02**, **ASI03** | Least-privilege tool sets per agent. All tools are read-only lookups; the Report Writer has none. No code execution, no write actions | Code review: `agent.build_*` | Tools gaining write capability in future versions |
 | T7 | Goal hijack that slips past input filters and yields a confident but wrong "Low" | ASI01 → **ASI09** (over-trust in output) | Structured output (Pydantic). Deterministic guardrail validates coverage and ATT&CK IDs and cross-checks every verdict against a rule-based evidence score. Disagreements go to human review | Red team: every hijack of the loud target is caught. Unit tests | **Low-evidence insiders** (score < 3): a successful deception is not caught. Measured as 6/49 in the worst case on the quiet scenario's tool-output vector |
-| T8 | Hallucinated findings (invented employees, fake technique IDs) | ASI09 | Guardrail rejects employees not in the input and IDs not in the ATT&CK bundle | Unit tests | — |
+| T8 | Hallucinated findings (invented employees, fake technique IDs) | ASI09 | Guardrail rejects employees not in the input and IDs not in the ATT&CK bundle | Unit tests | - |
 | T9 | Repudiation: no trace of what the agents saw or decided | STRIDE: Repudiation | Separate timestamped audit logs (`agent_audit.log`, `sanitizer.log`, `rag.log`). Guardrail decisions are logged per finding | Audit Trail tab | Logs are local files without integrity protection |
-| T10 | Secret leakage | STRIDE: Information disclosure | Keys only in `.env` (git-ignored). Only the IP address is sent to geolocation APIs | `.gitignore`; secret scan before publishing | — |
-| T11 | Denial of service / cost exhaustion via huge inputs | OWASP **ASI08** (cascading failures) | Schema length limits on text fields. Retry with backoff on rate limits | — | No per-run token budget yet |
+| T10 | Secret leakage | STRIDE: Information disclosure | Keys only in `.env` (git-ignored). Only the IP address is sent to geolocation APIs | `.gitignore`; secret scan before publishing | - |
+| T11 | Denial of service / cost exhaustion via huge inputs | OWASP **ASI08** (cascading failures) | Schema length limits on text fields. Retry with backoff on rate limits | - | No per-run token budget yet |
 
 ## Evaluation approach
 

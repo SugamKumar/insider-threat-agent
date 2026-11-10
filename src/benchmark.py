@@ -72,7 +72,7 @@ def main() -> None:
                       "|---|---|---|---|---|",
                       f"| {label} | {m['precision']:.0%} | {m['recall']:.0%} | {m['f1']:.0%} | {m['accuracy']:.0%} |", ""]
         else:
-            lines += ["_No output/findings.json found — run the pipeline first._", ""]
+            lines += ["_No output/findings.json found - run the pipeline first._", ""]
 
     lines += ["_Easy data is cleanly separable by design; hard data contains benign-but-unusual and "
               "malicious-but-quiet scenarios (see src/log_generator.py)._"]

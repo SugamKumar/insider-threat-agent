@@ -79,7 +79,7 @@ def evaluate(logs: list[dict[str, Any]], report_text: str | None = None,
 
 def main() -> int:
     if not LOG_PATH.exists() or not (FINDINGS_PATH.exists() or REPORT_PATH.exists()):
-        print("Need data/employee_logs.json and output/findings.json — run the pipeline first.")
+        print("Need data/employee_logs.json and output/findings.json - run the pipeline first.")
         return 1
 
     logs = json.loads(LOG_PATH.read_text(encoding="utf-8"))

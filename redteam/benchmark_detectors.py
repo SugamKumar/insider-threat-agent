@@ -1,7 +1,7 @@
 """
 benchmark_detectors.py
 
-Offline, deterministic benchmark of the input-side controls — no LLM calls.
+Offline, deterministic benchmark of the input-side controls - no LLM calls.
 
 Measures, over the red-team corpus:
   * v1 detection rate (original 13-phrase substring filter)
@@ -102,7 +102,7 @@ def run() -> str:
         lines.append(f"| ATT&CK technique + mitigation descriptions | {len(attck)} | "
                      f"{pct(attck_fp1, len(attck))} | {pct(attck_fp2, len(attck))} |")
     else:
-        lines.append("| ATT&CK descriptions | — | data/mitre_attack.json not found | |")
+        lines.append("| ATT&CK descriptions | - | data/mitre_attack.json not found | |")
 
     lines += ["", "## Payloads v2 does not catch", "",
               "These are what the downstream controls (spotlighting, ticket verification, "

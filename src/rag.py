@@ -138,7 +138,7 @@ def build_vector_store() -> Chroma:
     Load MITRE ATT&CK data, extract techniques and mitigations, embed them,
     and persist the combined vector store to disk.
 
-    Runs once — subsequent calls should use load_vector_store() instead.
+    Runs once - subsequent calls should use load_vector_store() instead.
 
     Returns:
         A Chroma vector store instance ready for retrieval.
@@ -170,7 +170,7 @@ def build_vector_store() -> Chroma:
         len(techniques), len(mitigations), len(all_documents)
     )
     print(f"📚 Extracted {len(techniques)} techniques + {len(mitigations)} mitigations")
-    print("⏳ Embedding into ChromaDB — this takes 3–5 minutes on first run...")
+    print("⏳ Embedding into ChromaDB - this takes 3-5 minutes on first run...")
 
     embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
 
@@ -261,11 +261,11 @@ if __name__ == "__main__":
     print("\n🔍 Technique query: 'employee downloading large amounts of data after hours'")
     for i, doc in enumerate(get_retriever("technique").invoke(
             "employee downloading large amounts of data after hours"), 1):
-        print(f"  {i}. {doc.metadata.get('technique_id')} — {doc.metadata.get('name')}")
+        print(f"  {i}. {doc.metadata.get('technique_id')} - {doc.metadata.get('name')}")
 
     print("\n🔍 Mitigation query: 'prevent unauthorized data exfiltration'")
     for i, doc in enumerate(get_retriever("mitigation").invoke(
             "how to prevent unauthorized data exfiltration"), 1):
-        print(f"  {i}. {doc.metadata.get('mitigation_id')} — {doc.metadata.get('name')}")
+        print(f"  {i}. {doc.metadata.get('mitigation_id')} - {doc.metadata.get('name')}")
 
     print("\n✅ RAG knowledge base ready")

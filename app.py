@@ -1,5 +1,5 @@
 """
-app.py — Insider Threat Detection System · Streamlit UI
+app.py - Insider Threat Detection System · Streamlit UI
 """
 
 import json
@@ -117,14 +117,14 @@ tab_run, tab_dash, tab_logs, tab_report, tab_audit, tab_sec = st.tabs([
 ])
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 1 — Run Pipeline
+# TAB 1 - Run Pipeline
 # ══════════════════════════════════════════════════════════════════════════════
 with tab_run:
     st.header("Run Detection Pipeline")
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Step 1 — Generate Logs")
+        st.subheader("Step 1 - Generate Logs")
         st.caption("Synthesize employee activity logs with realistic suspicious and normal patterns.")
         if st.button("🔄 Generate New Logs", use_container_width=True):
             from log_generator import generate_logs, save_dataset
@@ -139,8 +139,8 @@ with tab_run:
             st.rerun()
 
     with col2:
-        st.subheader("Step 2 — Run Agents")
-        st.caption("Launch: Threat Analyst → IR Advisor → Report Writer. Takes 2–4 minutes.")
+        st.subheader("Step 2 - Run Agents")
+        st.caption("Launch: Threat Analyst → IR Advisor → Report Writer. Takes 2-4 minutes.")
 
         if not LOG_PATH.exists():
             st.warning("⚠️ Generate logs first.")
@@ -152,7 +152,7 @@ with tab_run:
             status.info("🧹 Sanitizing logs...")
             prog.progress(15)
             time.sleep(0.5)
-            status.info("🤖 Agents running — this takes 2–4 minutes...")
+            status.info("🤖 Agents running - this takes 2-4 minutes...")
             prog.progress(30)
 
             result = run_pipeline()
@@ -167,7 +167,7 @@ with tab_run:
                 st.code(result.stderr, language="bash")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 2 — Dashboard
+# TAB 2 - Dashboard
 # ══════════════════════════════════════════════════════════════════════════════
 with tab_dash:
     st.header("📊 Threat Dashboard")
@@ -347,7 +347,7 @@ with tab_dash:
             st.info("Run the pipeline to see MITRE ATT&CK and risk visualizations.")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 3 — Logs Viewer
+# TAB 3 - Logs Viewer
 # ══════════════════════════════════════════════════════════════════════════════
 with tab_logs:
     st.header("Employee Activity Logs")
@@ -388,13 +388,13 @@ with tab_logs:
                     st.write(f"**Files Accessed:** {log['files_accessed']}")
                     st.write(f"**Bytes Transferred:** {log['bytes_transferred']:,}")
                     if "destination" in log:
-                        st.write(f"**Destination:** {log.get('destination')} · **Ticket:** {log.get('ticket_id') or '—'}")
+                        st.write(f"**Destination:** {log.get('destination')} · **Ticket:** {log.get('ticket_id') or '-'}")
                         st.write(f"**Resource:** `{log.get('resource')}`")
                     if "scenario" in log:
                         st.caption(f"Ground-truth scenario (hidden from agents): {log['scenario']}")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 4 — Incident Report
+# TAB 4 - Incident Report
 # ══════════════════════════════════════════════════════════════════════════════
 with tab_report:
     st.header("Incident Report")
@@ -409,11 +409,11 @@ with tab_report:
         st.markdown(report)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 5 — Audit Trail
+# TAB 5 - Audit Trail
 # ══════════════════════════════════════════════════════════════════════════════
 with tab_audit:
     st.header("Audit Trail")
-    st.caption("Every pipeline step and every redacted injection attempt is logged with a timestamp — supports non-repudiation (STRIDE) and post-incident review of agent behaviour.")
+    st.caption("Every pipeline step and every redacted injection attempt is logged with a timestamp - supports non-repudiation (STRIDE) and post-incident review of agent behaviour.")
 
     ca, cb = st.columns(2)
     with ca:
@@ -424,7 +424,7 @@ with tab_audit:
         st.code(load_text(SANITIZER_LOG), language="log")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 6 — Security Evaluation
+# TAB 6 - Security Evaluation
 # ══════════════════════════════════════════════════════════════════════════════
 with tab_sec:
     st.header("🧪 Security Evaluation")
@@ -448,8 +448,8 @@ with tab_sec:
         _run_and_refresh("Benchmarking baselines on easy and hard data...", "src/benchmark.py", "--with-llm")
 
     sections = [
-        ("Red team — real LLM", REDTEAM_DIR / "llm_summary.md"),
-        ("Red team — worst-case (non-LLM guarantees)", REDTEAM_DIR / "worst-case_summary.md"),
+        ("Red team - real LLM", REDTEAM_DIR / "llm_summary.md"),
+        ("Red team - worst-case (non-LLM guarantees)", REDTEAM_DIR / "worst-case_summary.md"),
         ("Injection detector benchmark", REDTEAM_DIR / "detector_benchmark.md"),
         ("Detection baselines vs LLM", BENCHMARK_PATH),
     ]

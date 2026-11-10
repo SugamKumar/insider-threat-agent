@@ -1,24 +1,24 @@
 """
 guardrails.py
 
-Output-side controls (OWASP ASI09 — Human-Agent Trust Exploitation; also the
+Output-side controls (OWASP ASI09 - Human-Agent Trust Exploitation; also the
 last line of defence against ASI01 goal hijack).
 
 The Threat Analyst must return structured findings (AnalysisResult). Before
 anything is reported they pass through two checks that do not involve an LLM:
 
-  1. Validation — every input employee must be covered exactly once, no
+  1. Validation - every input employee must be covered exactly once, no
      invented employee IDs, technique IDs must exist in ATT&CK, risk level
      must be one of four values.
 
-  2. Deterministic cross-check — an independent, rule-based signal score is
+  2. Deterministic cross-check - an independent, rule-based signal score is
      computed from the raw evidence (action, hour, volume vs peers, destination,
      resource ownership, tampering markers, ticket verification). If the LLM
      rates an entry Low while the signals are elevated, or drops an entry, the
      finding is marked NEEDS HUMAN REVIEW instead of being silently accepted.
 
 Why this matters: an injection that slips past every input filter usually
-shows up as exactly this — a confident "Low" on an entry whose hard evidence
+shows up as exactly this - a confident "Low" on an entry whose hard evidence
 says otherwise. The cross-check cannot be talked out of its score.
 """
 
@@ -132,7 +132,7 @@ class GuardrailReport:
                  "| Employee | Agent risk | Technique | Technique valid | Evidence score | Status |",
                  "|---|---|---|---|---|---|"]
         for r in self.reviewed:
-            status = f"⚠️ NEEDS HUMAN REVIEW — {r.review_reason}" if r.needs_review else "✅ consistent"
+            status = f"⚠️ NEEDS HUMAN REVIEW - {r.review_reason}" if r.needs_review else "✅ consistent"
             lines.append(f"| {r.employee_id} | {r.llm_risk} | {r.technique_id} | "
                          f"{'yes' if r.technique_valid else 'NO'} | {r.signal_score} | {status} |")
         if self.hallucinated_employees:

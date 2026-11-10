@@ -8,9 +8,9 @@ process, so when several modules each call it, every module ends up writing to
 whichever file was configured first. This helper gives each component its own
 dedicated log file instead, which keeps the audit trail separable:
 
-  logs/agent_audit.log  — pipeline / agent decisions
-  logs/sanitizer.log    — prompt-injection detections
-  logs/rag.log          — vector store build / load events
+  logs/agent_audit.log  - pipeline / agent decisions
+  logs/sanitizer.log    - prompt-injection detections
+  logs/rag.log          - vector store build / load events
 """
 
 import logging

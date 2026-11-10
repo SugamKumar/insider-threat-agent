@@ -6,7 +6,7 @@ LLM-generated Markdown incident report.
 
 LLM output is not perfectly regular: it may bold IDs (**EMP-0485**), use
 non-ASCII hyphens (EMP‑0485 with U+2011), merge the technique ID and name into
-one cell ("T1133 – External Remote Services"), or reorder columns. The parser
+one cell ("T1133 - External Remote Services"), or reorder columns. The parser
 therefore normalises the text and reads every Markdown table row that contains
 an employee ID, instead of relying on one exact column layout.
 """
@@ -17,7 +17,7 @@ import pandas as pd
 
 RISK_LEVELS = ("Critical", "High", "Medium", "Low")
 
-_HYPHENS = dict.fromkeys(map(ord, "‐‑‒–—―−"), "-")
+_HYPHENS = dict.fromkeys(map(ord, "\u2010\u2011\u2012\u2013\u2014\u2015\u2212"), "-")
 _EMP_RE = re.compile(r"\bEMP-\d{3,}\b")
 _TECH_RE = re.compile(r"\bT\d{4}(?:\.\d{3})?\b")
 _RISK_RE = re.compile(r"^(Critical|High|Medium|Low)\b", re.IGNORECASE)

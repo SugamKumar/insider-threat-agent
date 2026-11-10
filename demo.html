@@ -130,7 +130,7 @@ td strong{color:var(--text)}
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-icon">🛡️</div>
-      <div><h1>ThreatScope</h1><p id="sidebar-fname">—</p></div>
+      <div><h1>ThreatScope</h1><p id="sidebar-fname">-</p></div>
     </div>
     <div>
       <div class="nav-label">Views</div>
@@ -140,8 +140,8 @@ td strong{color:var(--text)}
       <button class="nav-btn" onclick="show('actions',this)">✦ Recommended actions</button>
       <button class="nav-btn" onclick="show('rawreport',this)">☰ Full report</button>
     </div>
-    <div class="meta-card"><h3>Loaded file</h3><p id="meta-file">—</p></div>
-    <div class="meta-card"><h3>Parsed findings</h3><p id="meta-stats">—</p></div>
+    <div class="meta-card"><h3>Loaded file</h3><p id="meta-file">-</p></div>
+    <div class="meta-card"><h3>Parsed findings</h3><p id="meta-stats">-</p></div>
     <div class="sidebar-foot">
       <div class="pill"><span class="dot"></span>Client-side parse · no server</div>
       <button class="reload-btn" onclick="resetUI()">↩ Load another file</button>
@@ -153,14 +153,14 @@ td strong{color:var(--text)}
     <!-- OVERVIEW -->
     <section class="panel active" id="overview">
       <div class="page-head">
-        <div><h2>Incident overview</h2><p id="report-subtitle">—</p></div>
-        <span class="badge" id="overall-badge">—</span>
+        <div><h2>Incident overview</h2><p id="report-subtitle">-</p></div>
+        <span class="badge" id="overall-badge">-</span>
       </div>
       <div class="kpi-grid">
-        <div class="kpi"><div class="kpi-label">Total findings</div><div class="kpi-val" id="kpi-total">—</div><div class="kpi-sub" id="kpi-total-sub">—</div></div>
-        <div class="kpi"><div class="kpi-label">Critical</div><div class="kpi-val" id="kpi-critical" style="color:var(--red)">—</div><div class="kpi-sub" id="kpi-critical-sub">—</div></div>
-        <div class="kpi"><div class="kpi-label">High risk</div><div class="kpi-val" id="kpi-high" style="color:var(--orange)">—</div><div class="kpi-sub" id="kpi-high-sub">—</div></div>
-        <div class="kpi"><div class="kpi-label">Data flagged</div><div class="kpi-val" id="kpi-data">—</div><div class="kpi-sub">Potential exfil volume</div></div>
+        <div class="kpi"><div class="kpi-label">Total findings</div><div class="kpi-val" id="kpi-total">-</div><div class="kpi-sub" id="kpi-total-sub">-</div></div>
+        <div class="kpi"><div class="kpi-label">Critical</div><div class="kpi-val" id="kpi-critical" style="color:var(--red)">-</div><div class="kpi-sub" id="kpi-critical-sub">-</div></div>
+        <div class="kpi"><div class="kpi-label">High risk</div><div class="kpi-val" id="kpi-high" style="color:var(--orange)">-</div><div class="kpi-sub" id="kpi-high-sub">-</div></div>
+        <div class="kpi"><div class="kpi-label">Data flagged</div><div class="kpi-val" id="kpi-data">-</div><div class="kpi-sub">Potential exfil volume</div></div>
       </div>
       <div class="two-col">
         <div class="card">
@@ -180,7 +180,7 @@ td strong{color:var(--text)}
 
     <!-- FINDINGS -->
     <section class="panel" id="findings">
-      <div class="page-head"><div><h2>Threat findings</h2><p>Per-employee breakdown — parsed from §3</p></div></div>
+      <div class="page-head"><div><h2>Threat findings</h2><p>Per-employee breakdown - parsed from §3</p></div></div>
       <div class="emp-list" id="emp-list"></div>
     </section>
 
@@ -288,8 +288,8 @@ function parseReport(raw) {
   const text = normalise(raw);
   const d = {
     employees:[], critical:0, high:0, medium:0, low:0,
-    totalData:'—', date:'—', status:'—', ticket:'—',
-    detection:'—', systems:'—', scope:'—', start:'—',
+    totalData:'-', date:'-', status:'-', ticket:'-',
+    detection:'-', systems:'-', scope:'-', start:'-',
     summaryBullets:[], overallRisk:'High',
     mitre:[], actions:[]
   };
@@ -316,7 +316,7 @@ function parseReport(raw) {
     if(bullets) d.summaryBullets = bullets.map(b=>clean(b.replace(/^\s*[*-]\s+/,'')));
   }
 
-  // §2 Incident details table — key/value
+  // §2 Incident details table - key/value
   const sec2M = cleaned.match(/##\s*2\.\s*incident details([\s\S]*?)(?=##\s*3\.)/i);
   if(sec2M){
     const rows = sec2M[1].match(/^\|[^|]+\|[^|]+\|/gm)||[];
@@ -366,7 +366,7 @@ function parseReport(raw) {
       // Extract technique id
       const techM=mitreRaw.match(/T\d{4}(?:\.\d+)?/i);
       const techId=techM?techM[0].toUpperCase():'';
-      const techName=mitreRaw.replace(/T\d{4}(?:\.\d+)?/i,'').replace(/^[-–\s]+/,'').trim()||'—';
+      const techName=mitreRaw.replace(/T\d{4}(?:\.\d+)?/i,'').replace(/^[--\s]+/,'').trim()||'-';
 
       d.employees.push({id:empId,username,action,dataVol,techId,techName,risk,containment});
       const rl=risk.toLowerCase();
@@ -387,14 +387,14 @@ function parseReport(raw) {
       if(cells.length<4)return;
       if(/^[-\s]+$/.test(cells[1])||cells[1].toLowerCase().includes('technique'))return;
       const techId=clean(cells[1]);
-      if(!techId||techId==='—'||techId==='-')return;
+      if(!techId||techId==='-'||techId==='-')return;
       const name=clean(cells[2]);
       const tactic=clean(cells[3]);
-      const mitigation=cells[4]?clean(cells[4]):'—';
+      const mitigation=cells[4]?clean(cells[4]):'-';
       // find matching employee for risk
       const findingNum=parseInt(clean(cells[0]))||0;
       const emp=d.employees[findingNum-1];
-      const risk=emp?emp.risk:'—';
+      const risk=emp?emp.risk:'-';
       d.mitre.push({finding:clean(cells[0]),techId,name,tactic,mitigation,risk});
     });
   }
@@ -413,7 +413,7 @@ function parseReport(raw) {
       if(clean(cells[0]))lastPhase=phase;
       const action=clean(cells[1]);
       const detail=clean(cells[2]);
-      const findings=cells[3]?clean(cells[3]):'—';
+      const findings=cells[3]?clean(cells[3]):'-';
       if(action)d.actions.push({phase,action,detail,findings});
     });
   }
@@ -441,7 +441,7 @@ function generateUI(){
   ob.className='badge '+riskCls(d.overallRisk);
 
   // KPIs
-  document.getElementById('kpi-total').textContent=total||'—';
+  document.getElementById('kpi-total').textContent=total||'-';
   document.getElementById('kpi-total-sub').textContent=d.scope||'Across departments';
   document.getElementById('kpi-critical').textContent=d.critical;
   const crit=d.employees.find(e=>e.risk.toLowerCase()==='critical');
@@ -455,7 +455,7 @@ function generateUI(){
   if(d.summaryBullets.length){
     sumEl.innerHTML='<ul>'+d.summaryBullets.map(b=>`<li style="color:var(--muted);font-size:0.8rem;margin-bottom:5px">${b}</li>`).join('')+'</ul>';
   } else {
-    sumEl.textContent='Summary bullets not detected — see Full Report tab.';
+    sumEl.textContent='Summary bullets not detected - see Full Report tab.';
   }
 
   // Severity bars
@@ -477,7 +477,7 @@ function generateUI(){
     ['Systems',d.systems],['Scope',d.scope],['Ticket',d.ticket]
   ];
   document.getElementById('meta-grid').innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">`+
-    metaItems.map(([k,v])=>`<div><div style="color:var(--faint);font-size:0.67rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">${k}</div><div style="color:var(--text);font-weight:600;font-size:0.82rem">${v||'—'}</div></div>`).join('')+'</div>';
+    metaItems.map(([k,v])=>`<div><div style="color:var(--faint);font-size:0.67rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">${k}</div><div style="color:var(--text);font-weight:600;font-size:0.82rem">${v||'-'}</div></div>`).join('')+'</div>';
 
   // Findings
   document.getElementById('emp-list').innerHTML=d.employees.length?d.employees.map(e=>{
@@ -490,12 +490,12 @@ function generateUI(){
       <div class="emp-desc">${e.action}</div>
       <div class="progress"><span style="width:${pct}%"></span></div>
       <div class="emp-meta">
-        ${e.techId?`<span class="badge b-tag">${e.techId}${e.techName&&e.techName!=='—'?' — '+e.techName.slice(0,30):''}</span>`:''}
-        ${e.dataVol&&e.dataVol!=='—'?`<span class="badge b-low">${e.dataVol}</span>`:''}
+        ${e.techId?`<span class="badge b-tag">${e.techId}${e.techName&&e.techName!=='-'?' - '+e.techName.slice(0,30):''}</span>`:''}
+        ${e.dataVol&&e.dataVol!=='-'?`<span class="badge b-low">${e.dataVol}</span>`:''}
       </div>
       ${e.containment?`<div class="emp-contain">🔒 ${e.containment}</div>`:''}
     </div>`;
-  }).join(''):'<div style="color:var(--muted);padding:1rem">No findings parsed — check report format.</div>';
+  }).join(''):'<div style="color:var(--muted);padding:1rem">No findings parsed - check report format.</div>';
 
   // MITRE table
   document.getElementById('mitre-tbody').innerHTML=d.mitre.length?d.mitre.map(m=>`

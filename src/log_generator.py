@@ -5,18 +5,18 @@ Generates synthetic employee behavior logs to simulate insider threat scenarios.
 
 Two difficulty levels:
 
-  easy — suspicious and normal entries are cleanly separated (off-hours, huge
+  easy - suspicious and normal entries are cleanly separated (off-hours, huge
          volumes, suspicious action names). A one-line rule scores ~100% here,
          so it is useful for smoke tests but proves little about an LLM.
 
-  hard — adds realistic ambiguity in both directions:
+  hard - adds realistic ambiguity in both directions:
            benign but scary-looking : approved after-hours maintenance,
                                       quarter-end finance exports, business travel VPN
            malicious but quiet      : low-and-slow exfil via ordinary email,
                                       cross-department file access, USB in business
                                       hours, after-hours work with a forged ticket
          Telling these apart needs context (destination, resource, change
-         tickets) — the kind of reasoning rules and anomaly scores miss.
+         tickets) - the kind of reasoning rules and anomaly scores miss.
 
 Each entry has a hidden ground-truth `risk_flag` and `scenario`, both stripped
 before agents see the data. Approved change tickets are written to

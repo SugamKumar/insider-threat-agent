@@ -3,19 +3,19 @@ sanitizer.py
 
 Input-side controls that run before any log entry reaches an agent.
 
-Maps to: OWASP Agentic Top 10 — ASI01 (Agent Goal Hijack)
-         MITRE ATLAS — AML.T0051 (LLM Prompt Injection), AML.T0051.001 (Indirect)
+Maps to: OWASP Agentic Top 10 - ASI01 (Agent Goal Hijack)
+         MITRE ATLAS - AML.T0051 (LLM Prompt Injection), AML.T0051.001 (Indirect)
 
 Two layers, applied in order by `sanitize_logs`:
 
-  1. Schema validation (schema.py) — allowlist. Each field must match its
+  1. Schema validation (schema.py) - allowlist. Each field must match its
      expected shape (an action name, an IP, a place name...). This is the
      strongest control because it does not depend on guessing attack wording.
 
-  2. Injection detection (`detect_injection`) — for free-ish text fields that
+  2. Injection detection (`detect_injection`) - for free-ish text fields that
      pass the schema (location, resource, destination) and for untrusted text
-     from tools and RAG. The text is normalised first so common evasions —
-     homoglyphs, zero-width characters, leetspeak, spaced letters, base64 —
+     from tools and RAG. The text is normalised first so common evasions -
+     homoglyphs, zero-width characters, leetspeak, spaced letters, base64 -
      collapse back to plain text, then matched against word-bounded patterns
      covering override phrases, chat-template/role markers, instructions aimed
      at the model, and a few non-English variants.
@@ -25,7 +25,7 @@ benchmark can measure the improvement honestly.
 
 Anything removed is replaced with a visible marker and audit-logged. Agents are
 told that a marker means someone tampered with the record, which should RAISE
-suspicion — so an attacker gains nothing by triggering the filter.
+suspicion - so an attacker gains nothing by triggering the filter.
 """
 
 import base64
@@ -45,7 +45,7 @@ TAMPER_NOTE_FIELD = "integrity_warning"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# v1 — original substring blocklist (kept for comparison only)
+# v1 - original substring blocklist (kept for comparison only)
 # ══════════════════════════════════════════════════════════════════════════════
 INJECTION_PATTERNS_V1: list[str] = [
     r"ignore previous instructions", r"ignore all instructions", r"you are now",
@@ -61,7 +61,7 @@ def detect_v1(value: str) -> bool:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# v2 — normalise, decode, then match word-bounded patterns
+# v2 - normalise, decode, then match word-bounded patterns
 # ══════════════════════════════════════════════════════════════════════════════
 _ZERO_WIDTH = dict.fromkeys(map(ord, "​‌‍‎‏⁠⁡⁢⁣﻿­"))
 
@@ -224,7 +224,7 @@ def sanitize_logs(logs: list[Any], schema_validation: bool = True,
     sanitized = []
     for i, log in enumerate(logs):
         if not isinstance(log, dict):
-            logger.error("Skipping malformed log entry at index %d — not a dict", i)
+            logger.error("Skipping malformed log entry at index %d - not a dict", i)
             continue
         sanitized.append(sanitize_log_entry(log, schema_validation, injection_detection))
 

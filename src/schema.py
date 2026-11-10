@@ -56,7 +56,7 @@ DEPT_SHARES: dict[str, str] = {
 SENSITIVE_SHARES: list[str] = [r"\\hr-share\payroll", r"\\legal-share\m-and-a", r"\\fin-share\board"]
 PERSONAL_DOMAINS: list[str] = ["gmail.com", "proton.me", "outlook.com", "yahoo.com"]
 
-# Fields that carry labels for evaluation only — never shown to agents
+# Fields that carry labels for evaluation only - never shown to agents
 HIDDEN_FIELDS: frozenset[str] = frozenset({"risk_flag", "scenario"})
 
 TAMPER_MARKER = "[INVALID - FAILED SCHEMA VALIDATION]"
@@ -69,7 +69,7 @@ _RESOURCE = re.compile(r"^[A-Za-z0-9_\\/.:\- ]{1,120}$")
 
 
 def _is_place_name(value: str) -> bool:
-    """A city/place: letters in any script plus space ' - . , — at most 6 words, 64 chars."""
+    """A city/place: letters in any script plus space ' - . , - at most 6 words, 64 chars."""
     if not 1 <= len(value) <= 64 or len(value.split()) > 6:
         return False
     return all(

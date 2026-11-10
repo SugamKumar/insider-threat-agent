@@ -5,16 +5,16 @@ CrewAI tool wrappers. Logic lives in threat_intel.py (framework-free and
 unit-tested); this module only exposes it to agents and adds the RAG tools.
 
 Tools:
-  1. lookup_mitre_technique    — ATT&CK technique details by ID (local STIX bundle)
-  2. check_ip_reputation       — AbuseIPDB abuse confidence score
-  3. geolocate_ip              — ip-api.com geolocation + hosting/proxy flags
-  4. check_data_volume_anomaly — transfer volume vs department baseline
-  5. verify_change_ticket      — out-of-band check of tickets cited in logs
-  6. search_mitre_techniques   — RAG semantic search over ATT&CK techniques
-  7. search_mitre_mitigations  — RAG semantic search over ATT&CK mitigations
+  1. lookup_mitre_technique    - ATT&CK technique details by ID (local STIX bundle)
+  2. check_ip_reputation       - AbuseIPDB abuse confidence score
+  3. geolocate_ip              - ip-api.com geolocation + hosting/proxy flags
+  4. check_data_volume_anomaly - transfer volume vs department baseline
+  5. verify_change_ticket      - out-of-band check of tickets cited in logs
+  6. search_mitre_techniques   - RAG semantic search over ATT&CK techniques
+  7. search_mitre_mitigations  - RAG semantic search over ATT&CK mitigations
 
 Least privilege (OWASP ASI02/ASI03): agents receive only the tools their role
-needs — see agent.build_agents. The Report Writer has none.
+needs - see agent.build_agents. The Report Writer has none.
 
 Every external result is treated as untrusted: string fields are scanned for
 injection and the output is wrapped in an UNTRUSTED block (threat_intel.py);

@@ -1,11 +1,11 @@
 """
 rag_integrity.py
 
-Provenance control for the RAG knowledge base (OWASP ASI06 — Memory & Context
-Poisoning; MITRE ATLAS AML.T0070 — RAG Poisoning).
+Provenance control for the RAG knowledge base (OWASP ASI06 - Memory & Context
+Poisoning; MITRE ATLAS AML.T0070 - RAG Poisoning).
 
 At build time rag.py records the SHA-256 of every document it ingested from the
-official ATT&CK bundle in data/rag_manifest.json — a file kept outside the
+official ATT&CK bundle in data/rag_manifest.json - a file kept outside the
 vector database. At query time, retrieved documents whose content hash is not
 in the manifest are dropped and audit-logged. An attacker who can write to the
 vector store (insert or edit an embedding's text) therefore cannot get that
@@ -60,7 +60,7 @@ def filter_verified(docs: list[Any], path: Path = MANIFEST_PATH) -> tuple[list[A
     """
     manifest = load_manifest(path)
     if manifest is None:
-        logger.warning("No RAG manifest found — provenance cannot be verified. Rebuild with `python src/rag.py`.")
+        logger.warning("No RAG manifest found - provenance cannot be verified. Rebuild with `python src/rag.py`.")
         return docs, 0, False
     kept = [d for d in docs if content_hash(d.page_content) in manifest]
     dropped = len(docs) - len(kept)

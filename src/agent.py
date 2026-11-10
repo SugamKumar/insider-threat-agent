@@ -85,12 +85,12 @@ def _patched_completion(*args, **kwargs):
             err = str(e)
             last = attempt == max_attempts - 1
             if "Request too large" in err:
-                # Waiting cannot shrink a single oversized request — fail with a clear hint
+                # Waiting cannot shrink a single oversized request - fail with a clear hint
                 raise RuntimeError(
                     "A single LLM request exceeded the provider's tokens-per-minute limit. "
                     "Lower ANALYSIS_BATCH_SIZE (e.g. set ANALYSIS_BATCH_SIZE=2) and re-run.") from e
             if "rate_limit_exceeded" in err and "tokens per day" in err.replace("\n", " "):
-                # Daily quota: retrying within this run is pointless — stop with a clear message
+                # Daily quota: retrying within this run is pointless - stop with a clear message
                 hint = re.search(r"try again in ((?:\d+h)?(?:\d+m)?[\d.]+s)", err)
                 raise RuntimeError(
                     "Groq daily token quota (TPD) for this model is used up"
@@ -102,11 +102,11 @@ def _patched_completion(*args, **kwargs):
                 print(f"[Rate limit] Waiting {wait:.0f}s before retry {attempt + 2}/{max_attempts}...")
                 time.sleep(wait)
             elif "output_parse_failed" in err and not last:
-                # Groq could not parse the model's output (intermittent with gpt-oss models) — resample
+                # Groq could not parse the model's output (intermittent with gpt-oss models) - resample
                 print(f"[Output parse failure] Retrying request (attempt {attempt + 2}/{max_attempts})...")
                 time.sleep(3)
             elif "tool_use_failed" in err and "'JSON'" in err:
-                raise  # final answer sent as a fake tool call — salvaged by run_analysis
+                raise  # final answer sent as a fake tool call - salvaged by run_analysis
             elif "tool_use_failed" in err and not last:
                 print(f"[Tool name leak] Retrying tool call (attempt {attempt + 2}/3)...")
                 time.sleep(3)
@@ -175,7 +175,7 @@ def build_analysis_task(analyst: Agent, formatted_logs: str, n_entries: int) -> 
         description=(
             f"Analyze the following employee activity logs for insider threat indicators.\n\n"
             f"{formatted_logs}\n\n"
-            f"There are exactly {n_entries} log entries. Produce exactly one finding per entry — do not "
+            f"There are exactly {n_entries} log entries. Produce exactly one finding per entry - do not "
             "skip any and do not invent employees. For each entry give: the employee ID, the action, "
             "the most relevant ATT&CK technique ID and name ('None' if benign), a risk level "
             "(Critical / High / Medium / Low) and one or two sentences of reasoning citing the evidence.\n\n"
@@ -265,7 +265,7 @@ def parse_findings_json(text: str) -> AnalysisResult | None:
         data = data["arguments"]
     try:
         return AnalysisResult(**data)
-    except Exception:  # noqa: BLE001 — schema mismatch
+    except Exception:  # noqa: BLE001 - schema mismatch
         return None
 
 
@@ -334,11 +334,11 @@ def run_analysis(raw_logs: list[dict[str, Any]], cfg: DefenseConfig) -> tuple[An
                     raise
                 result = salvage_from_error(e)
                 raw = str(e)[:4000]
-                logger.warning("Batch %d attempt %d raised %s — salvaged=%s", n, attempt, type(e).__name__,
+                logger.warning("Batch %d attempt %d raised %s - salvaged=%s", n, attempt, type(e).__name__,
                                result is not None)
             if result is not None:
                 break
-            logger.warning("Batch %d attempt %d gave no parseable findings — %s", n, attempt,
+            logger.warning("Batch %d attempt %d gave no parseable findings - %s", n, attempt,
                            "retrying" if attempt == 1 else "giving up")
             time.sleep(BATCH_PAUSE_SECONDS)
         raws.append(raw)
@@ -353,7 +353,7 @@ def run_analysis(raw_logs: list[dict[str, Any]], cfg: DefenseConfig) -> tuple[An
 
 
 def compact_context(result: AnalysisResult, guard: GuardrailReport | None) -> str:
-    """One line per finding — keeps the response agents' prompts small (provider token limits)."""
+    """One line per finding - keeps the response agents' prompts small (provider token limits)."""
     review = {r.employee_id: r.review_reason for r in guard.review_queue} if guard else {}
     lines = ["Employee | Action | Technique | Risk | Reasoning"]
     for f in result.findings:
@@ -383,7 +383,7 @@ def run_pipeline(cfg: DefenseConfig | None = None) -> None:
     logger.info("Pipeline start | %d raw entries | model=%s | %s", len(raw_logs), LLM_NAME, cfg.describe())
     print(f"\n🚀 Starting insider threat detection pipeline ({cfg.describe()})\n")
 
-    # Stage 1 — sanitize + analyse
+    # Stage 1 - sanitize + analyse
     result, raw, clean_logs = run_analysis(raw_logs, cfg)
     tampered = sum("integrity_warning" in l for l in clean_logs)
     logger.info("Sanitization | %d entries | %d flagged as tampered", len(clean_logs), tampered)
@@ -392,7 +392,7 @@ def run_pipeline(cfg: DefenseConfig | None = None) -> None:
         raise RuntimeError("Threat Analyst output could not be parsed as structured findings:\n" + raw[:2000])
     logger.info("Analyst returned %d findings", len(result.findings))
 
-    # Stage 2 — deterministic guardrail
+    # Stage 2 - deterministic guardrail
     if cfg.output_guardrail:
         guard = guardrail_review(result, clean_logs, tickets)
         for r in guard.reviewed:
@@ -404,7 +404,7 @@ def run_pipeline(cfg: DefenseConfig | None = None) -> None:
 
     context = compact_context(result, guard)
 
-    # Stage 3 — response planning + report
+    # Stage 3 - response planning + report
     ir_advisor, report_writer = build_response_agents(cfg)
     tasks = build_response_tasks(ir_advisor, report_writer, context)
     report = Crew(agents=[ir_advisor, report_writer], tasks=tasks, process=Process.sequential,
@@ -425,7 +425,7 @@ def run_pipeline(cfg: DefenseConfig | None = None) -> None:
 
     logger.info("Report saved to %s; findings saved to %s", REPORT_OUTPUT_PATH, FINDINGS_OUTPUT_PATH)
     n_review = len(guard.review_queue) if guard else 0
-    print(f"\n✅ Pipeline complete — {len(result.findings)} findings, {n_review} routed to human review."
+    print(f"\n✅ Pipeline complete - {len(result.findings)} findings, {n_review} routed to human review."
           f"\n   Report: {REPORT_OUTPUT_PATH}\n   Findings: {FINDINGS_OUTPUT_PATH}")
 
 

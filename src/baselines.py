@@ -3,11 +3,11 @@ baselines.py
 
 Non-LLM detectors the agents must beat to justify their cost:
 
-  naive_rules        — a typical SIEM correlation rule: suspicious action name,
+  naive_rules        - a typical SIEM correlation rule: suspicious action name,
                        off-hours activity, or a large transfer.
-  context_rules      — the guardrail's evidence score (adds destination,
+  context_rules      - the guardrail's evidence score (adds destination,
                        resource ownership and ticket verification) ≥ threshold.
-  isolation_forest   — unsupervised anomaly detection on numeric features
+  isolation_forest   - unsupervised anomaly detection on numeric features
                        (bytes, files, hour, off-hours, suspicious-action flag).
 
 All take a list of log dicts and return a list of booleans (True = flagged).
