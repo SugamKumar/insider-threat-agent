@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ThreatScope</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c1117;--surface:#111821;--border:rgba(255,255,255,0.07);
+  --text:#d7e0ea;--muted:#93a3b5;--faint:#617183;
+  --cyan:#30c6d1;--blue:#5ea3ff;--purple:#b38cff;
+  --red:#ff87b0;--orange:#ffb163;--green:#6dd38a;
+  --font:"Inter",sans-serif;--mono:"JetBrains Mono",monospace;
+}
+html{-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(circle at 80% 10%,rgba(48,198,209,0.07),transparent 30%),radial-gradient(circle at 10% 90%,rgba(94,163,255,0.07),transparent 30%),var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;min-height:100vh}
+button{font:inherit;cursor:pointer;border:0;background:none}
+#upload-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+.upload-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:3rem;text-align:center;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.upload-icon{font-size:3rem;margin-bottom:1rem}
+.upload-card h1{font-size:1.6rem;font-weight:800;letter-spacing:-0.04em;margin-bottom:0.5rem}
+.upload-card p{color:var(--muted);font-size:0.85rem;margin-bottom:2rem}
+.drop-zone{border:2px dashed rgba(48,198,209,0.3);border-radius:16px;padding:2.5rem 2rem;margin-bottom:1.5rem;transition:all 200ms ease;cursor:pointer;position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:rgba(48,198,209,0.7);background:rgba(48,198,209,0.05)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-zone .dz-icon{font-size:2rem;margin-bottom:0.75rem}
+.drop-zone .dz-text{font-size:0.82rem;color:var(--muted)}
+.drop-zone .dz-text strong{color:var(--cyan)}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:0.75rem 1.5rem;border-radius:12px;background:linear-gradient(135deg,rgba(48,198,209,0.2),rgba(94,163,255,0.15));border:1px solid rgba(48,198,209,0.35);color:var(--text);font-weight:600;font-size:0.85rem;transition:all 160ms ease;cursor:pointer}
+.btn-primary:hover{border-color:rgba(48,198,209,0.6);background:rgba(48,198,209,0.25)}
+.file-chosen{font-size:0.78rem;color:var(--green);margin-top:0.75rem;display:none}
+#app{display:none;grid-template-columns:255px 1fr;min-height:100vh}
+.sidebar{background:linear-gradient(180deg,#111821,#0a0f16);border-right:1px solid var(--border);padding:1.5rem 1.25rem;display:flex;flex-direction:column;gap:1.25rem;position:sticky;top:0;height:100vh;overflow-y:auto}
+.main{min-width:0;padding:2rem 2.5rem;display:grid;gap:1.5rem;align-content:start}
+.brand{display:flex;align-items:center;gap:12px;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.brand-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(48,198,209,0.18),rgba(94,163,255,0.10));border:1px solid rgba(48,198,209,0.28);display:grid;place-items:center;font-size:18px;flex-shrink:0}
+.brand h1{font-size:1.05rem;font-weight:800;letter-spacing:-0.03em}
+.brand p{font-size:0.7rem;color:var(--faint);margin-top:2px}
+.nav-label{font-size:0.67rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--faint);margin-bottom:0.3rem}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:0.65rem 0.85rem;border-radius:10px;color:var(--muted);font-size:0.81rem;font-weight:500;border:1px solid transparent;transition:all 150ms ease;text-align:left;margin-bottom:2px}
+.nav-btn:hover{background:rgba(255,255,255,0.03);color:var(--text)}
+.nav-btn.active{background:rgba(48,198,209,0.10);color:var(--text);border-color:rgba(48,198,209,0.22)}
+.meta-card{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:12px;padding:0.85rem}
+.meta-card h3{font-size:0.77rem;font-weight:600;margin-bottom:0.35rem}
+.meta-card p{font-size:0.71rem;color:var(--muted);line-height:1.55}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:0.35rem 0.75rem;border-radius:999px;font-size:0.7rem;font-weight:600;background:rgba(109,211,138,0.1);color:var(--green);border:1px solid rgba(109,211,138,0.22)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.sidebar-foot{margin-top:auto;display:grid;gap:0.5rem}
+.reload-btn{width:100%;padding:0.6rem;border-radius:10px;border:1px solid var(--border);color:var(--muted);font-size:0.78rem;background:rgba(255,255,255,0.02);transition:all 150ms ease}
+.reload-btn:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.panel{display:none}.panel.active{display:grid;gap:1.5rem}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.page-head h2{font-size:1.55rem;font-weight:800;letter-spacing:-0.04em}
+.page-head p{font-size:0.8rem;color:var(--muted);margin-top:4px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.kpi{background:linear-gradient(180deg,var(--surface),#0d131b);border:1px solid var(--border);border-radius:16px;padding:1.2rem;box-shadow:0 6px 18px rgba(0,0,0,0.3)}
+.kpi-label{font-size:0.67rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--faint);margin-bottom:0.4rem}
+.kpi-val{font-size:1.95rem;font-weight:800;letter-spacing:-0.04em;font-variant-numeric:tabular-nums}
+.kpi-sub{font-size:0.69rem;color:var(--muted);margin-top:0.3rem}
+.card{background:linear-gradient(180deg,var(--surface),#0d131b);border:1px solid var(--border);border-radius:16px;padding:1.25rem;box-shadow:0 4px 14px rgba(0,0,0,0.25)}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+.card-title{font-size:0.93rem;font-weight:700;letter-spacing:-0.02em}
+.card-sub{font-size:0.7rem;color:var(--faint);margin-top:2px}
+.two-col{display:grid;grid-template-columns:1.4fr 1fr;gap:1rem}
+.badge{display:inline-flex;align-items:center;padding:0.27rem 0.6rem;border-radius:999px;font-size:0.67rem;font-weight:700;letter-spacing:0.03em;white-space:nowrap}
+.b-critical{background:rgba(240,98,146,0.12);color:var(--red);border:1px solid rgba(240,98,146,0.22)}
+.b-high{background:rgba(255,154,61,0.12);color:var(--orange);border:1px solid rgba(255,154,61,0.22)}
+.b-medium{background:rgba(94,163,255,0.12);color:var(--blue);border:1px solid rgba(94,163,255,0.22)}
+.b-low{background:rgba(109,211,138,0.12);color:var(--green);border:1px solid rgba(109,211,138,0.22)}
+.b-tag{background:rgba(179,140,255,0.12);color:var(--purple);border:1px solid rgba(179,140,255,0.22)}
+.sev-list{display:grid;gap:0.8rem}
+.sev-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem}
+.sev-bar{height:6px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden}
+.sev-fill{height:100%;border-radius:inherit}
+.emp-list{display:grid;gap:0.6rem}
+.emp-row{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:0.9rem 1rem}
+.emp-top{display:flex;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:0.35rem;flex-wrap:wrap}
+.emp-name{font-size:0.84rem;font-weight:600;font-family:var(--mono)}
+.emp-id{font-size:0.7rem;color:var(--faint);margin-left:6px}
+.emp-desc{font-size:0.74rem;color:var(--muted);margin-bottom:0.45rem}
+.emp-contain{font-size:0.72rem;color:var(--faint);margin-top:0.35rem;padding-top:0.35rem;border-top:1px solid rgba(255,255,255,0.04)}
+.emp-meta{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.4rem}
+.progress{height:5px;border-radius:999px;background:rgba(255,255,255,0.06);margin:0.4rem 0}
+.progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:0.78rem}
+th{color:var(--faint);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.09em;padding:0.65rem 0.75rem;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+td{padding:0.68rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--muted);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td strong{color:var(--text)}
+.report-body{font-size:0.84rem;line-height:1.8;color:var(--muted)}
+.report-body h1{font-size:1.3rem;font-weight:800;color:var(--text);margin:0 0 1rem;letter-spacing:-0.03em}
+.report-body h2{font-size:0.97rem;font-weight:700;color:var(--text);margin:1.5rem 0 0.6rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)}
+.report-body h3{font-size:0.87rem;font-weight:600;color:var(--text);margin:1rem 0 0.4rem}
+.report-body p{margin-bottom:0.7rem;max-width:80ch}
+.report-body ul,.report-body ol{margin:0.5rem 0 0.75rem 1.3rem;display:grid;gap:0.3rem}
+.report-body strong{color:var(--text)}
+.report-body code{font-family:var(--mono);font-size:0.78rem;background:rgba(255,255,255,0.06);padding:0.1rem 0.4rem;border-radius:5px;color:var(--cyan)}
+.report-body table{width:100%;border-collapse:collapse;margin:0.75rem 0}
+.report-body th{font-size:0.66rem;color:var(--faint);padding:0.6rem 0.7rem;border-bottom:1px solid var(--border)}
+.report-body td{padding:0.65rem 0.7rem;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--muted);font-size:0.78rem}
+.report-body hr{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
+@media(max-width:860px){#app{grid-template-columns:1fr}.sidebar{display:none}.kpi-grid,.two-col{grid-template-columns:1fr 1fr}.main{padding:1.25rem}}
+</style>
+</head>
+<body>
+
+<!-- Upload screen -->
+<div id="upload-screen">
+  <div class="upload-card">
+    <div class="upload-icon">🛡️</div>
+    <h1>ThreatScope</h1>
+    <p>Drop your <code style="color:var(--cyan);background:rgba(48,198,209,0.1);padding:2px 8px;border-radius:6px">incident_report.md</code> to generate the SOC dashboard instantly</p>
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept=".md,.txt"/>
+      <div class="dz-icon">📄</div>
+      <div class="dz-text"><strong>Click to browse</strong> or drag & drop your .md file here</div>
+    </div>
+    <div class="file-chosen" id="file-chosen">✓ <span id="file-name"></span></div>
+    <br/>
+    <button class="btn-primary" id="generate-btn" style="display:none" onclick="generateUI()">⚡ Generate dashboard</button>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div><h1>ThreatScope</h1><p id="sidebar-fname">—</p></div>
+    </div>
+    <div>
+      <div class="nav-label">Views</div>
+      <button class="nav-btn active" onclick="show('overview',this)">◈ Overview</button>
+      <button class="nav-btn" onclick="show('findings',this)">⚑ Threat findings</button>
+      <button class="nav-btn" onclick="show('mitre',this)">⋯ MITRE mapping</button>
+      <button class="nav-btn" onclick="show('actions',this)">✦ Recommended actions</button>
+      <button class="nav-btn" onclick="show('rawreport',this)">☰ Full report</button>
+    </div>
+    <div class="meta-card"><h3>Loaded file</h3><p id="meta-file">—</p></div>
+    <div class="meta-card"><h3>Parsed findings</h3><p id="meta-stats">—</p></div>
+    <div class="sidebar-foot">
+      <div class="pill"><span class="dot"></span>Client-side parse · no server</div>
+      <button class="reload-btn" onclick="resetUI()">↩ Load another file</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section class="panel active" id="overview">
+      <div class="page-head">
+        <div><h2>Incident overview</h2><p id="report-subtitle">—</p></div>
+        <span class="badge" id="overall-badge">—</span>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-label">Total findings</div><div class="kpi-val" id="kpi-total">—</div><div class="kpi-sub" id="kpi-total-sub">—</div></div>
+        <div class="kpi"><div class="kpi-label">Critical</div><div class="kpi-val" id="kpi-critical" style="color:var(--red)">—</div><div class="kpi-sub" id="kpi-critical-sub">—</div></div>
+        <div class="kpi"><div class="kpi-label">High risk</div><div class="kpi-val" id="kpi-high" style="color:var(--orange)">—</div><div class="kpi-sub" id="kpi-high-sub">—</div></div>
+        <div class="kpi"><div class="kpi-label">Data flagged</div><div class="kpi-val" id="kpi-data">—</div><div class="kpi-sub">Potential exfil volume</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">Executive summary</div><div class="card-sub">Parsed from §1</div></div></div>
+          <div id="exec-summary" style="font-size:0.81rem;color:var(--muted)"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">Severity distribution</div></div></div>
+          <div class="sev-list" id="sev-bars"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Incident metadata</div><div style="font-size:0.7rem;color:var(--faint)">Parsed from §2</div></div>
+        <div id="meta-grid"></div>
+      </div>
+    </section>
+
+    <!-- FINDINGS -->
+    <section class="panel" id="findings">
+      <div class="page-head"><div><h2>Threat findings</h2><p>Per-employee breakdown — parsed from §3</p></div></div>
+      <div class="emp-list" id="emp-list"></div>
+    </section>
+
+    <!-- MITRE -->
+    <section class="panel" id="mitre">
+      <div class="page-head"><div><h2>MITRE ATT&CK mapping</h2><p>Parsed from §4</p></div></div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Technique ID</th><th>Technique Name</th><th>Tactic(s)</th><th>Mitigation(s)</th><th>Risk</th></tr></thead>
+            <tbody id="mitre-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTIONS -->
+    <section class="panel" id="actions">
+      <div class="page-head"><div><h2>Recommended actions</h2><p>Parsed from §5</p></div></div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Phase</th><th>Action</th><th>Detail</th><th>Findings</th></tr></thead>
+            <tbody id="actions-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- RAW REPORT -->
+    <section class="panel" id="rawreport">
+      <div class="page-head"><div><h2>Full report</h2><p>Rendered from your markdown file</p></div></div>
+      <div class="card report-body" id="raw-report-body"></div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ── Normalise unicode dashes/hyphens so parsing is consistent ──
+function normalise(s) {
+  // non-breaking hyphen (\u2011), en-dash (\u2013), em-dash (\u2014), minus (\u2212) → regular hyphen
+  return s.replace(/[\u2011\u2013\u2014\u2212]/g, '-').replace(/\u00a0/g, ' ');
+}
+
+// ── Strip bold/italic markdown markers ──
+function clean(s) {
+  return s.replace(/\*\*/g,'').replace(/\*/g,'').replace(/`/g,'').trim();
+}
+
+// ── Inline markdown render ──
+function inlineRender(s) {
+  return s
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*\*(.*?)\*\*\*/g,'<strong><em>$1</em></strong>')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/`(.*?)`/g,'<code>$1</code>');
+}
+
+// ── Minimal markdown → HTML renderer ──
+function renderMd(md) {
+  md = md.replace(/<think>[\s\S]*?<\/think>/gi,'');
+  md = md.replace(/^```[\w]*\n?([\s\S]*?)\n?```$/gm,'$1');
+  const lines = md.split('\n');
+  let html='', inTable=false, inList=false, tableRows=[];
+
+  const flushTable=()=>{
+    if(!tableRows.length)return;
+    let t='<table>';
+    tableRows.forEach((row,i)=>{
+      const tag=i===0?'th':'td';
+      const cells=row.split('|').map(c=>c.trim()).filter((_,ci,a)=>ci>0&&ci<a.length-1);
+      if(i===1)return;
+      t+='<tr>'+cells.map(c=>`<${tag}>${inlineRender(c)}</${tag}>`).join('')+'</tr>';
+    });
+    t+='</table>'; html+=t; tableRows=[];
+  };
+  const flushList=()=>{if(inList){html+='</ul>';inList=false;}};
+
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i], trimmed=line.trim();
+    if(trimmed.startsWith('|')){flushList();inTable=true;tableRows.push(trimmed);continue;}
+    else if(inTable){flushTable();inTable=false;}
+    if(!trimmed||trimmed==='---'||trimmed==='***'){flushList();if(trimmed==='---')html+='<hr/>';continue;}
+    if(/^#{1,6}\s/.test(trimmed)){flushList();const lv=trimmed.match(/^(#+)/)[1].length,txt=trimmed.replace(/^#+\s/,'');html+=`<h${lv}>${inlineRender(txt)}</h${lv}>`;continue;}
+    if(/^[*-]\s/.test(trimmed)){if(!inList){html+='<ul>';inList=true;}html+=`<li>${inlineRender(trimmed.replace(/^[*-]\s/,''))}</li>`;continue;}
+    flushList();if(trimmed)html+=`<p>${inlineRender(trimmed)}</p>`;
+  }
+  flushList();if(inTable)flushTable();
+  return html;
+}
+
+// ── Badge helpers ──
+const riskCls=(r)=>{r=(r||'').toLowerCase();if(r.includes('critical'))return'b-critical';if(r.includes('high'))return'b-high';if(r.includes('medium'))return'b-medium';return'b-low';};
+const riskPct={critical:95,high:72,medium:45,low:18};
+
+// ── Split table row into cells, handle leading/trailing pipes ──
+function splitRow(row){
+  return row.split('|').map(c=>c.trim()).filter((_,i,a)=>i>0&&i<a.length-1);
+}
+
+// ── Parse the report ──
+function parseReport(raw) {
+  const text = normalise(raw);
+  const d = {
+    employees:[], critical:0, high:0, medium:0, low:0,
+    totalData:'—', date:'—', status:'—', ticket:'—',
+    detection:'—', systems:'—', scope:'—', start:'—',
+    summaryBullets:[], overallRisk:'High',
+    mitre:[], actions:[]
+  };
+
+  // Strip think blocks
+  const cleaned = text.replace(/<think>[\s\S]*?<\/think>/gi,'');
+
+  // Overall risk
+  const riskM = cleaned.match(/overall risk[^:]*:\s*\*?\*?(\w+)/i);
+  if(riskM) d.overallRisk = riskM[1];
+
+  // Ticket
+  const tickM = cleaned.match(/#(IR[-\w]+)/i);
+  if(tickM) d.ticket = '#'+tickM[1];
+
+  // Report date
+  const dateM = cleaned.match(/report date[^:]*:\s*([^\n\r]+)/i);
+  if(dateM) d.date = clean(dateM[1]);
+
+  // Exec summary bullets (§1)
+  const sumM = cleaned.match(/##\s*1\.\s*executive summary([\s\S]*?)(?=##\s*2\.)/i);
+  if(sumM){
+    const bullets = sumM[1].match(/^\s*[*-]\s+(.+)$/gm);
+    if(bullets) d.summaryBullets = bullets.map(b=>clean(b.replace(/^\s*[*-]\s+/,'')));
+  }
+
+  // §2 Incident details table — key/value
+  const sec2M = cleaned.match(/##\s*2\.\s*incident details([\s\S]*?)(?=##\s*3\.)/i);
+  if(sec2M){
+    const rows = sec2M[1].match(/^\|[^|]+\|[^|]+\|/gm)||[];
+    rows.forEach(row=>{
+      const cells=splitRow(row);
+      if(cells.length<2)return;
+      const key=clean(cells[0]).toLowerCase();
+      const val=clean(cells[1]);
+      if(key.includes('incident start')||key.includes('start')) d.start=val;
+      else if(key.includes('detection')) d.detection=val;
+      else if(key.includes('scope')) d.scope=val;
+      else if(key.includes('status')) d.status=val;
+      else if(key.includes('systems')) d.systems=val;
+      else if(key.includes('data potential')) d.totalData=val;
+    });
+  }
+
+  // §3 Threat findings table
+  // Columns: # | Employee (ID / Username) | Anomalous Action | Data Transferred | MITRE ATT&CK Technique | Risk Level | Immediate Containment
+  const sec3M = cleaned.match(/##\s*3\.\s*threat findings([\s\S]*?)(?=##\s*4\.)/i);
+  if(sec3M){
+    const rows=(sec3M[1].match(/^\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|/gm)||[]);
+    rows.forEach(row=>{
+      const cells=splitRow(row);
+      if(cells.length<6)return;
+      // skip header / separator rows
+      if(/^[-\s#]+$/.test(cells[0])||cells[0].toLowerCase().includes('employee')||/^-+$/.test(cells[1]))return;
+
+      // cells[1] = "EMP-0485 (ryan38)"
+      const empCell=clean(cells[1]);
+      const empIdM=empCell.match(/EMP-\d{4}/i);
+      if(!empIdM)return;
+      const empId=empIdM[0].toUpperCase();
+      const usernameM=empCell.match(/\(([^)]+)\)/);
+      const username=usernameM?usernameM[1]:'';
+
+      const action=clean(cells[2]);
+      const dataVol=clean(cells[3]);
+      const mitreRaw=clean(cells[4]);
+      const riskRaw=clean(cells[5]);
+      const containment=cells[6]?clean(cells[6]):'';
+
+      // Extract risk word
+      const riskM2=riskRaw.match(/Critical|High|Medium|Low/i);
+      const risk=riskM2?riskM2[0]:'Low';
+
+      // Extract technique id
+      const techM=mitreRaw.match(/T\d{4}(?:\.\d+)?/i);
+      const techId=techM?techM[0].toUpperCase():'';
+      const techName=mitreRaw.replace(/T\d{4}(?:\.\d+)?/i,'').replace(/^[-–\s]+/,'').trim()||'—';
+
+      d.employees.push({id:empId,username,action,dataVol,techId,techName,risk,containment});
+      const rl=risk.toLowerCase();
+      if(rl==='critical')d.critical++;
+      else if(rl==='high')d.high++;
+      else if(rl==='medium')d.medium++;
+      else d.low++;
+    });
+  }
+
+  // §4 MITRE mapping table
+  // Columns: Finding # | Technique ID | Technique Name | Tactic(s) | Mitigation(s)
+  const sec4M = cleaned.match(/##\s*4\.\s*mitre att&?ck mapping([\s\S]*?)(?=##\s*5\.)/i);
+  if(sec4M){
+    const rows=(sec4M[1].match(/^\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|/gm)||[]);
+    rows.forEach(row=>{
+      const cells=splitRow(row);
+      if(cells.length<4)return;
+      if(/^[-\s]+$/.test(cells[1])||cells[1].toLowerCase().includes('technique'))return;
+      const techId=clean(cells[1]);
+      if(!techId||techId==='—'||techId==='-')return;
+      const name=clean(cells[2]);
+      const tactic=clean(cells[3]);
+      const mitigation=cells[4]?clean(cells[4]):'—';
+      // find matching employee for risk
+      const findingNum=parseInt(clean(cells[0]))||0;
+      const emp=d.employees[findingNum-1];
+      const risk=emp?emp.risk:'—';
+      d.mitre.push({finding:clean(cells[0]),techId,name,tactic,mitigation,risk});
+    });
+  }
+
+  // §5 Recommended actions table
+  // Columns: Phase | Action | Detail | Relevant Finding(s)
+  const sec5M = cleaned.match(/##\s*5\.\s*recommended actions([\s\S]*?)(?=##\s*6\.)/i);
+  if(sec5M){
+    const rows=(sec5M[1].match(/^\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|/gm)||[]);
+    let lastPhase='';
+    rows.forEach(row=>{
+      const cells=splitRow(row);
+      if(cells.length<3)return;
+      if(/^[-\s]+$/.test(cells[0])||cells[1].toLowerCase().includes('action'))return;
+      const phase=clean(cells[0])||lastPhase;
+      if(clean(cells[0]))lastPhase=phase;
+      const action=clean(cells[1]);
+      const detail=clean(cells[2]);
+      const findings=cells[3]?clean(cells[3]):'—';
+      if(action)d.actions.push({phase,action,detail,findings});
+    });
+  }
+
+  return d;
+}
+
+// ── Render UI from parsed data ──
+let parsedData=null, rawMd='';
+
+function generateUI(){
+  const d=parsedData;
+  const total=d.employees.length;
+
+  // Sidebar
+  const fname=document.getElementById('file-name').textContent;
+  document.getElementById('sidebar-fname').textContent=fname;
+  document.getElementById('meta-file').textContent=fname;
+  document.getElementById('meta-stats').innerHTML=`${total} employees parsed<br>${d.critical} critical · ${d.high} high · ${d.medium} medium · ${d.low} low`;
+
+  // Overview header
+  document.getElementById('report-subtitle').textContent=`${d.date} · ${d.ticket}`;
+  const ob=document.getElementById('overall-badge');
+  ob.textContent='Overall risk: '+d.overallRisk;
+  ob.className='badge '+riskCls(d.overallRisk);
+
+  // KPIs
+  document.getElementById('kpi-total').textContent=total||'—';
+  document.getElementById('kpi-total-sub').textContent=d.scope||'Across departments';
+  document.getElementById('kpi-critical').textContent=d.critical;
+  const crit=d.employees.find(e=>e.risk.toLowerCase()==='critical');
+  document.getElementById('kpi-critical-sub').textContent=crit?`${crit.id} · ${crit.action.slice(0,28)}…`:'None detected';
+  document.getElementById('kpi-high').textContent=d.high;
+  document.getElementById('kpi-high-sub').textContent=d.high?`${d.high} employee${d.high!==1?'s':''} flagged`:'None';
+  document.getElementById('kpi-data').textContent=d.totalData;
+
+  // Exec summary
+  const sumEl=document.getElementById('exec-summary');
+  if(d.summaryBullets.length){
+    sumEl.innerHTML='<ul>'+d.summaryBullets.map(b=>`<li style="color:var(--muted);font-size:0.8rem;margin-bottom:5px">${b}</li>`).join('')+'</ul>';
+  } else {
+    sumEl.textContent='Summary bullets not detected — see Full Report tab.';
+  }
+
+  // Severity bars
+  const sevData=[
+    {label:'Critical',count:d.critical,cls:'b-critical',color:'var(--red)'},
+    {label:'High',count:d.high,cls:'b-high',color:'var(--orange)'},
+    {label:'Medium',count:d.medium,cls:'b-medium',color:'var(--blue)'},
+    {label:'Low',count:d.low,cls:'b-low',color:'var(--green)'},
+  ];
+  document.getElementById('sev-bars').innerHTML=sevData.map(s=>`
+    <div>
+      <div class="sev-top"><span class="badge ${s.cls}">${s.label}</span><span style="font-size:0.72rem;color:var(--faint)">${s.count} finding${s.count!==1?'s':''}</span></div>
+      <div class="sev-bar"><div class="sev-fill" style="width:${total?Math.max(5,s.count/total*100):5}%;background:${s.color}"></div></div>
+    </div>`).join('');
+
+  // Metadata grid
+  const metaItems=[
+    ['Incident start',d.start],['Detection',d.detection],['Status',d.status],
+    ['Systems',d.systems],['Scope',d.scope],['Ticket',d.ticket]
+  ];
+  document.getElementById('meta-grid').innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">`+
+    metaItems.map(([k,v])=>`<div><div style="color:var(--faint);font-size:0.67rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">${k}</div><div style="color:var(--text);font-weight:600;font-size:0.82rem">${v||'—'}</div></div>`).join('')+'</div>';
+
+  // Findings
+  document.getElementById('emp-list').innerHTML=d.employees.length?d.employees.map(e=>{
+    const rc=riskCls(e.risk), pct=riskPct[(e.risk||'low').toLowerCase()]||18;
+    return `<div class="emp-row">
+      <div class="emp-top">
+        <div><span class="emp-name">${e.id}</span><span class="emp-id">${e.username}</span></div>
+        <span class="badge ${rc}">${e.risk}</span>
+      </div>
+      <div class="emp-desc">${e.action}</div>
+      <div class="progress"><span style="width:${pct}%"></span></div>
+      <div class="emp-meta">
+        ${e.techId?`<span class="badge b-tag">${e.techId}${e.techName&&e.techName!=='—'?' — '+e.techName.slice(0,30):''}</span>`:''}
+        ${e.dataVol&&e.dataVol!=='—'?`<span class="badge b-low">${e.dataVol}</span>`:''}
+      </div>
+      ${e.containment?`<div class="emp-contain">🔒 ${e.containment}</div>`:''}
+    </div>`;
+  }).join(''):'<div style="color:var(--muted);padding:1rem">No findings parsed — check report format.</div>';
+
+  // MITRE table
+  document.getElementById('mitre-tbody').innerHTML=d.mitre.length?d.mitre.map(m=>`
+    <tr>
+      <td style="font-family:var(--mono);color:var(--cyan)">${m.techId}</td>
+      <td><strong>${m.name}</strong></td>
+      <td>${m.tactic}</td>
+      <td style="font-size:0.73rem">${m.mitigation}</td>
+      <td><span class="badge ${riskCls(m.risk)}">${m.risk}</span></td>
+    </tr>`).join('')
+  :'<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:1.5rem">No MITRE techniques detected</td></tr>';
+
+  // Recommended actions table
+  let lastPhaseRendered='';
+  document.getElementById('actions-tbody').innerHTML=d.actions.length?d.actions.map(a=>{
+    const showPhase=a.phase!==lastPhaseRendered;
+    lastPhaseRendered=a.phase;
+    const phaseCell=showPhase?`<td rowspan="1" style="font-weight:700;color:var(--text);white-space:nowrap">${a.phase}</td>`:`<td style="color:var(--faint)"></td>`;
+    return `<tr>${phaseCell}<td>${a.action}</td><td style="font-size:0.73rem">${a.detail}</td><td style="font-family:var(--mono);font-size:0.73rem;color:var(--cyan)">${a.findings}</td></tr>`;
+  }).join('')
+  :'<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:1.5rem">No recommended actions detected</td></tr>';
+
+  // Full report render
+  document.getElementById('raw-report-body').innerHTML=renderMd(rawMd);
+
+  // Show app
+  document.getElementById('upload-screen').style.display='none';
+  document.getElementById('app').style.display='grid';
+}
+
+function resetUI(){
+  document.getElementById('upload-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('file-input').value='';
+  document.getElementById('file-chosen').style.display='none';
+  document.getElementById('generate-btn').style.display='none';
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('overview').classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.nav-btn').classList.add('active');
+}
+
+function show(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// File handling
+const fileInput=document.getElementById('file-input');
+const dropZone=document.getElementById('drop-zone');
+
+function handleFile(file){
+  if(!file)return;
+  document.getElementById('file-name').textContent=file.name;
+  document.getElementById('file-chosen').style.display='block';
+  document.getElementById('generate-btn').style.display='inline-flex';
+  const reader=new FileReader();
+  reader.onload=e=>{rawMd=e.target.result;parsedData=parseReport(rawMd);};
+  reader.readAsText(file);
+}
+
+fileInput.addEventListener('change',e=>handleFile(e.target.files[0]));
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag');handleFile(e.dataTransfer.files[0]);});
+</script>
+</body>
+</html>

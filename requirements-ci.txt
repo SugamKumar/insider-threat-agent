@@ -1,0 +1,9 @@
+# Lightweight deps for the offline test suite (no LLM, no vector store)
+pandas==3.0.3
+numpy
+scikit-learn
+pydantic>=2
+faker==40.23.0
+python-dotenv==1.2.2
+requests==2.34.2
+pytest

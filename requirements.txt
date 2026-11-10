@@ -1,0 +1,30 @@
+# Minimum versions this project was developed with (Python 3.13, Windows).
+# Ranges rather than exact pins so pip can resolve a consistent set on a fresh install.
+
+# Agents & LLM
+crewai>=1.14
+litellm>=1.89
+langchain-groq>=1.1
+
+# RAG (chromadb is pulled in by langchain-chroma at a compatible version)
+langchain-core>=1.4
+langchain-chroma>=1.1
+langchain-huggingface>=1.2
+sentence-transformers>=5.6
+
+# Evaluation & guardrails
+pydantic>=2
+scikit-learn>=1.5
+
+# Dashboard
+streamlit>=1.58
+pandas>=2.2
+plotly>=6.0
+
+# Utilities
+faker>=40.0
+python-dotenv>=1.2
+requests>=2.32
+
+# Tests
+pytest

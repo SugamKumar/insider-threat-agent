@@ -1,0 +1,23 @@
+[
+  {
+    "ticket_id": "CHG-6240",
+    "employee_id": "EMP-5514",
+    "department": "IT",
+    "purpose": "patch window",
+    "status": "approved"
+  },
+  {
+    "ticket_id": "CHG-6241",
+    "employee_id": "EMP-5635",
+    "department": "Finance",
+    "purpose": "quarter-end close",
+    "status": "approved"
+  },
+  {
+    "ticket_id": "CHG-6242",
+    "employee_id": "EMP-4741",
+    "department": "IT",
+    "purpose": "patch window",
+    "status": "approved"
+  }
+]
