@@ -343,12 +343,18 @@ def run_analysis(raw_logs: list[dict[str, Any]], cfg: DefenseConfig) -> tuple[An
             time.sleep(BATCH_PAUSE_SECONDS)
         raws.append(raw)
         if result is None:
-            logger.error("Batch %d returned no parseable findings", n)
-            return None, "\n".join(raws), clean_logs
-        findings.extend(result.findings)
+            # Degrade gracefully: the entries of a failed batch get no finding, so the
+            # guardrail reports them as omitted and routes them to human review.
+            failed = [l.get("employee_id") for l in batch]
+            logger.error("Batch %d returned no parseable findings; routing %s to human review", n, failed)
+            print(f"⚠️  Batch {n} failed; {', '.join(map(str, failed))} will be flagged for human review")
+        else:
+            findings.extend(result.findings)
         if n < len(batches):
             time.sleep(BATCH_PAUSE_SECONDS)  # let the per-minute token budget refill
 
+    if not findings:
+        return None, "\n".join(raws), clean_logs
     return AnalysisResult(findings=findings), "\n".join(raws), clean_logs
 
 
