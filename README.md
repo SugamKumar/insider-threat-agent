@@ -43,7 +43,20 @@ The hard dataset mixes benign activity that looks unusual (approved maintenance,
 | Isolation Forest | 42% | 42% | 42% |
 | Context-aware rules | 88% | 80% | 83% |
 
-The context-aware rules were written alongside the data generator, so treat them as an upper bound rather than a fair competitor. To score the agents on the same kind of data, run the pipeline on hard data and then `python src/benchmark.py --with-llm`.
+The context-aware rules were written alongside the data generator, so treat them as an upper bound rather than a fair competitor.
+
+### LLM pipeline
+
+A full run with gpt-oss-120b on 10 hard entries (5 malicious, 5 benign), with the baselines scored on the same entries. Details and per-entry results: [docs/results/llm_pipeline_run.md](docs/results/llm_pipeline_run.md)
+
+| Detector | Precision | Recall | F1 |
+|---|---|---|---|
+| Naive SIEM-style rules | 43% | 60% | 50% |
+| Isolation Forest | 40% | 40% | 40% |
+| LLM agents | 80% | 80% | 80% |
+| Context-aware rules (upper bound) | 100% | 80% | 89% |
+
+The agents caught the forged change ticket, the cross-department access and the business-hours USB copy, and cleared the approved maintenance and quarter-end export that the naive rules flag. The one miss was a small email to a personal domain whose evidence score was below the guardrail threshold, which is the quiet-insider case from the threat model. Ten entries is a small sample, so this is a first measurement rather than a stable estimate.
 
 ## How it works
 
